@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>~/start</title>
+  <link href="https://fonts.cdnfonts.com/css/terminus" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:     #282828;
+      --bg1:    #32302f;
+      --bg2:    #3c3836;
+      --fg:     #ebdbb2;
+      --fg2:    #d5c4a1;
+      --fg3:    #a89984;
+      --fg4:    #928374;
+      --yellow: #fabd2f;
+      --green:  #b8bb26;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg2);
+      font-family: 'Terminus', 'Terminus (TTF)', 'Courier New', monospace;
+      font-size: 15px;
+      display: flex;
+      justify-content: center;
+      padding: 3rem 1rem;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    /* ── top bar ── */
+    .topbar {
+      border: 1px solid var(--bg2);
+      border-bottom: none;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: var(--fg4);
+      display: flex;
+      justify-content: space-between;
+      background: var(--bg1);
+    }
+
+    /* ── main box ── */
+    .box {
+      border: 1px solid var(--bg2);
+      padding: 1.4rem 1.6rem;
+      background: var(--bg1);
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--bg2);
+      margin: 1.2rem 0;
+    }
+
+    /* ── clock ── */
+    .clock-block { margin-bottom: 0.1rem; }
+    #clock {
+      font-size: 1.6rem;
+      color: var(--yellow);
+      letter-spacing: 0.06em;
+    }
+    #date {
+      font-size: 11px;
+      color: var(--fg4);
+      margin-top: 3px;
+    }
+
+    /* ── search ── */
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .search label { color: var(--fg4); white-space: nowrap; }
+    .search input {
+      background: var(--bg);
+      border: 1px solid var(--bg2);
+      color: var(--fg);
+      font-family: inherit;
+      font-size: 13px;
+      padding: 2px 6px;
+      outline: none;
+      width: 100%;
+      caret-color: var(--yellow);
+    }
+    .search input:focus { border-color: var(--fg4); }
+    .search input::placeholder { color: var(--bg2); }
+
+    /* ── links ── */
+    .links { display: flex; flex-direction: column; gap: 4px; }
+
+    .link-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .link-row::before {
+      content: '»';
+      color: var(--fg4);
+      font-size: 11px;
+    }
+    .link-row a {
+      color: var(--fg3);
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .link-row a:hover {
+      color: var(--fg);
+      text-decoration: underline;
+    }
+    .link-row .desc {
+      font-size: 11px;
+      color: var(--fg4);
+    }
+
+    /* ── footer ── */
+    .foot {
+      border: 1px solid var(--bg2);
+      border-top: none;
+      padding: 3px 8px;
+      font-size: 10px;
+      color: var(--fg4);
+      background: var(--bg1);
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>[ ~/start ]</span>
+    <span id="toptime"></span>
+  </div>
+
+  <div class="box">
+
+    <div class="clock-block">
+      <div id="clock">00:00</div>
+      <div id="date"></div>
+    </div>
+
+    <hr/>
+
+    <div class="search">
+      <label>search:</label>
+      <input id="q" type="text" placeholder="..." autofocus autocomplete="off" spellcheck="false"/>
+    </div>
+
+    <hr/>
+
+    <div class="links">
+      <div class="link-row">
+        <a href="https://github.com">github</a>
+        <span class="desc">// code &amp; repos</span>
+      </div>
+      <div class="link-row">
+        <a href="https://youtube.com">youtube</a>
+        <span class="desc">// video</span>
+      </div>
+      <div class="link-row">
+        <a href="https://crux.nu">crux linux</a>
+        <span class="desc">// ports-based linux</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">i lowkey miss her</div>
+
+</div>
+
+<script>
+  function tick() {
+    const n   = new Date();
+    const pad = x => String(x).padStart(2,'0');
+    const t   = `${pad(n.getHours())}:${pad(n.getMinutes())}`;
+    const days = ['sun','mon','tue','wed','thu','fri','sat'];
+    const mons = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    const d = `${days[n.getDay()]}  ${n.getDate()} ${mons[n.getMonth()]} ${n.getFullYear()}`;
+    document.getElementById('clock').textContent = t;
+    document.getElementById('date').textContent  = d;
+    document.getElementById('toptime').textContent = t;
+  }
+  tick(); setInterval(tick, 1000);
+
+  document.getElementById('q').addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const q = e.target.value.trim();
+    if (!q) return;
+    window.location.href = /^https?:\/\//.test(q) || /^[\w-]+\.(com|org|net|io|dev|nu)/.test(q)
+      ? (q.startsWith('http') ? q : 'https://' + q)
+      : `https://google.com/search?q=${encodeURIComponent(q)}`;
+  });
+</script>
+</body>
+</html>

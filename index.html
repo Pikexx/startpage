@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>~/start</title>
   <link href="https://fonts.cdnfonts.com/css/terminus" rel="stylesheet"/>
   <style>
@@ -16,21 +17,23 @@
       --yellow: #fabd2f;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-weight: normal; }
 
     body {
       background: var(--bg);
       color: var(--fg2);
       font-family: 'Terminus', 'Terminus (TTF)', 'Courier New', monospace;
-      font-size: 17px;
+      font-size: clamp(13px, 1.5vw, 17px);
       display: flex;
       justify-content: center;
-      padding: 4rem 1rem;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: clamp(1.5rem, 6vw, 4rem) clamp(0.75rem, 4vw, 1.5rem);
     }
 
     .wrap {
       width: 100%;
-      max-width: 680px;
+      max-width: min(680px, 96vw);
     }
 
     /* topbar */
@@ -38,7 +41,7 @@
       border: 1px solid var(--bg2);
       border-bottom: none;
       padding: 4px 12px;
-      font-size: 12px;
+      font-size: clamp(10px, 1.1vw, 12px);
       color: var(--fg4);
       display: flex;
       justify-content: space-between;
@@ -48,31 +51,26 @@
     /* main box */
     .box {
       border: 1px solid var(--bg2);
-      padding: 2rem 2.2rem;
+      padding: clamp(1rem, 4vw, 2rem) clamp(1rem, 4.5vw, 2.2rem);
       background: var(--bg1);
     }
 
     hr {
       border: none;
       border-top: 1px solid var(--bg2);
-      margin: 1.6rem 0;
+      margin: clamp(1rem, 3vw, 1.6rem) 0;
     }
 
     /* clock */
     #clock {
-      font-size: 2.6rem;
+      font-size: clamp(1.6rem, 5vw, 2.6rem);
       color: var(--yellow);
       letter-spacing: 0.06em;
       line-height: 1;
-    }
-    #clock .period {
-      font-size: 1rem;
-      color: var(--fg4);
-      margin-left: 6px;
-      letter-spacing: 0.2em;
+      font-weight: normal;
     }
     #date {
-      font-size: 12px;
+      font-size: clamp(10px, 1.1vw, 12px);
       color: var(--fg4);
       margin-top: 6px;
     }
@@ -89,7 +87,8 @@
       border: 1px solid var(--bg2);
       color: var(--fg);
       font-family: inherit;
-      font-size: 15px;
+      font-size: clamp(12px, 1.4vw, 15px);
+      font-weight: normal;
       padding: 4px 8px;
       outline: none;
       width: 100%;
@@ -99,52 +98,38 @@
     .search input::placeholder { color: var(--bg2); }
 
     /* links section */
-    .links-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      user-select: none;
-    }
-    .links-header span { color: var(--fg4); font-size: 12px; }
-    .toggle-hint { font-size: 11px; color: var(--fg4); opacity: 0.6; }
+    .links-header span { color: var(--fg4); font-size: clamp(10px, 1.1vw, 12px); }
 
     .links {
       display: flex;
       flex-direction: column;
       gap: 6px;
       margin-top: 1rem;
-      overflow: hidden;
-      transition: max-height 0.25s ease, opacity 0.25s ease;
-      max-height: 0;
-      opacity: 0;
-    }
-    .links.visible {
-      max-height: 300px;
-      opacity: 1;
     }
 
     .link-row {
       display: flex;
       align-items: baseline;
       gap: 10px;
+      flex-wrap: wrap;
     }
     .link-row::before {
       content: '»';
       color: var(--fg4);
-      font-size: 12px;
+      font-size: clamp(10px, 1.1vw, 12px);
     }
     .link-row a {
       color: var(--fg3);
       text-decoration: none;
-      font-size: 15px;
+      font-size: clamp(12px, 1.4vw, 15px);
+      font-weight: normal;
     }
     .link-row a:hover {
       color: var(--fg);
       text-decoration: underline;
     }
     .link-row .desc {
-      font-size: 12px;
+      font-size: clamp(10px, 1.1vw, 12px);
       color: var(--fg4);
     }
 
@@ -153,7 +138,7 @@
       border: 1px solid var(--bg2);
       border-top: none;
       padding: 4px 12px;
-      font-size: 11px;
+      font-size: clamp(10px, 1vw, 11px);
       color: var(--fg4);
       background: var(--bg1);
       text-align: right;
@@ -171,7 +156,7 @@
   <div class="box">
 
     <div>
-      <div id="clock">00:00<span class="period" id="period"></span></div>
+      <div id="clock">00:00</div>
       <div id="date"></div>
     </div>
 
@@ -184,12 +169,11 @@
 
     <hr/>
 
-    <div class="links-header" onclick="toggleLinks()" title="click to toggle">
+    <div class="links-header">
       <span>[ links ]</span>
-      <span class="toggle-hint" id="hint">click to show</span>
     </div>
 
-    <div class="links" id="links">
+    <div class="links">
       <div class="link-row">
         <a href="https://github.com">github</a>
         <span class="desc">// code &amp; repos</span>
@@ -211,18 +195,18 @@
 </div>
 
 <script>
-  // clock — 12h with am/pm as single letter
+  // clock — 12h with a/p suffix
   function tick() {
     const n   = new Date();
-    const pad = x => String(x).padStart(2,'0');
+    const pad = x => String(x).padStart(2, '0');
     let   h   = n.getHours();
     const pm  = h >= 12;
     h = h % 12 || 12;
-    const t = `${pad(h)}:${pad(n.getMinutes())}`;
+    const t   = `${pad(h)}:${pad(n.getMinutes())}`;
+    const suf = pm ? 'p' : 'a';
 
-    document.getElementById('clock').childNodes[0].textContent = t;
-    document.getElementById('period').textContent = pm ? 'p' : 'a';
-    document.getElementById('toptime').textContent = t + (pm ? 'p' : 'a');
+    document.getElementById('clock').textContent = t + suf;
+    document.getElementById('toptime').textContent = t + suf;
 
     const days = ['sun','mon','tue','wed','thu','fri','sat'];
     const mons = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
@@ -230,19 +214,6 @@
       `${days[n.getDay()]}  ${n.getDate()} ${mons[n.getMonth()]} ${n.getFullYear()}`;
   }
   tick(); setInterval(tick, 1000);
-
-  // toggle links
-  let shown = false;
-  function toggleLinks() {
-    shown = !shown;
-    document.getElementById('links').classList.toggle('visible', shown);
-    document.getElementById('hint').textContent = shown ? 'click to hide' : 'click to show';
-  }
-
-  // also toggle with L key
-  document.addEventListener('keydown', e => {
-    if (e.key === 'l' || e.key === 'L') toggleLinks();
-  });
 
   // search
   document.getElementById('q').addEventListener('keydown', e => {
